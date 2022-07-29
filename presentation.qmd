@@ -1,0 +1,113 @@
+---
+title: "Using Spatial Analysis in Strategic Decision-Making"
+author: "G. Nono Gueye, Ph.D."
+format: 
+  revealjs:
+    incremental: true
+    fontsize: 10px
+---
+
+
+# Disclaimer
+
+- I am not an expert in public health!
+
+- I can only take the easy questions at the end
+
+- For all difficult questions, Dr. Boni Ale will be happy to help!
+
+
+
+# 
+
+:::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+knitr::include_graphics(here::here("2022-07-27_afrimapr/media/gueye_family_pic.jpeg"))
+```
+:::
+
+::: {.column width="50%"}
+- Christian
+- Ivorian / Cameroonian
+- Husband and father
+- Economics professor at Louisiana Tech University
+- Data Science trainer
+- Data Science and Economics consultant
+:::
+
+::::
+
+# Enough about me!
+
+It's time to talk about you!
+
+
+# Congratulations!
+
+- You have just been designated as the country's Minister for Health.
+
+
+# This is very exciting, but...
+
+You are now facing two main challenges:
+
+- You are inexperienced
+
+- A global pandemic just broke out!
+
+
+# The future of the nation is in your hands!
+
+
+# Strategy Board
+
+1. Make an assessment of the "state of things"
+
+- Where are all the health sites in the country?
+- Do we have enough "appropriate" health sites for storing and handling the cure?
+- Which health districts do not have "appropriate" health sites?
+
+
+# Strategy Board
+
+2. Capacity building (upgrade health sites)
+
+- Find the most ideal location in each health district
+- Identify the health site which is closest to the location
+- Are all "appropriate" health sites optimally located?
+- Which health districts are completely okay (do not need intervention)?
+
+
+# Strategy Board
+
+3. Risk assessments
+
+- Which health districts have the highest population *densities*?
+- Which health districts should we prioritize?
+
+
+# Not considered today {.scrollable}
+
+- Build or upgrade facilities? (which option is cost effective and least time consuming?)
+
+- Optimal dispatch of the cure throughout the country using road network data
+
+- The centroid method may not always be the best choice
+
+- Some health districts may be so small that buidling/upgrading a health facility may not be ideal
+
+- Many "appropriate" health sites are clustered so it may not be optimal to supply all of them with the cure due to its limited supply
+
+
+# Want to do the same for your country?
+
+- Country + admin shapefiles: [The Humanitarian Data Exchange](https://data.humdata.org/)
+
+- Heath sites point locations: The `{afrihealthsites}` package, which pulls data from [healthsites.io](https://www.healthsites.io/)
+
+- Road network data: [WFPGeoNode](https://geonode.wfp.org/)
+
+
+# Thank you
