@@ -5,6 +5,7 @@ format:
   revealjs:
     incremental: true
     fontsize: 10px
+self-contained: true
 ---
 
 
@@ -24,7 +25,7 @@ format:
 
 ::: {.column width="50%"}
 ```{r}
-knitr::include_graphics(here::here("2022-07-27_afrimapr/media/gueye_family_pic.jpeg"))
+knitr::include_graphics(here::here("media/gueye_family_pic.jpeg"))
 ```
 :::
 

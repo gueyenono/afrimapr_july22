@@ -23,12 +23,12 @@ sf_use_s2(FALSE) # To avoid an error regarding "duplicate vertex with edge" (sou
 # ----------------------------------------------------------------------------------
 
 # > Country polygon
-geo_country_raw <- st_read(dsn = here("2022-07-27_afrimapr/data/hdx/civ_admbnda_adm0_cntig_20180706/civ_admbnda_adm0_cntig_20180706.shp")) %>%
+geo_country_raw <- st_read(dsn = here("data/hdx/civ_admbnda_adm0_cntig_20180706/civ_admbnda_adm0_cntig_20180706.shp")) %>%
   st_transform(4326)
 
 
 # > Population for each health district
-pop_hd_raw <- read_xls(here("2022-07-27_afrimapr/data/BD ETS SANITAIRES_avec coord gps07062022.xls"), sheet = 2, skip = 4)
+pop_hd_raw <- read_xls(here("data/BD ETS SANITAIRES_avec coord gps07062022.xls"), sheet = 2, skip = 4)
 
 pop_hd_data <- pop_hd_raw %>%
   setNames(c("region", "district", "pop")) %>%
@@ -36,7 +36,7 @@ pop_hd_data <- pop_hd_raw %>%
   select(-region) 
 
 # > Health districts
-geo_hd_raw <- st_read(dsn = here("2022-07-27_afrimapr/data/admin_divisions_2020/DISTRICT SANITAIRE 2020.shp")) %>% 
+geo_hd_raw <- st_read(dsn = here("data/admin_divisions_2020/DISTRICT SANITAIRE 2020.shp")) %>% 
   st_transform(4326) %>%
   left_join(y = pop_hd_data, by = c("NOM" = "district")) %>%
   mutate(
@@ -52,7 +52,7 @@ geo_hd_raw <- st_read(dsn = here("2022-07-27_afrimapr/data/admin_divisions_2020/
 geo_hs_raw_1 <- afrihealthsites(country = "CIV", plot = FALSE)
 
 # > Health sites (2) (from the country's administration)
-hs_raw <- read_xls(here("2022-07-27_afrimapr/data/BD ETS SANITAIRES_avec coord gps07062022.xls"))
+hs_raw <- read_xls(here("data/BD ETS SANITAIRES_avec coord gps07062022.xls"))
 
 geo_hs_raw_2 <- hs_raw %>%
   clean_names() %>%
