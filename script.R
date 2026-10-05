@@ -14,29 +14,43 @@ pacman::p_load(
 )
 
 # Set mapping mode to interactive
-tmap_mode(mode = "view")
+tmap::tmap_mode(mode = "view")
 
-sf_use_s2(FALSE) # To avoid an error regarding "duplicate vertex with edge" (source: https://github.com/r-spatial/sf/issues/1762)
+# With many points, tmap v4 switches to WebGL (leafgl) in "view" mode, which
+# often fails to render. Use regular leaflet markers instead.
+tmap::tmap_options(modes = list(view = list(use_WebGL = FALSE)))
+
+sf::sf_use_s2(FALSE) # To avoid an error regarding "duplicate vertex with edge" (source: https://github.com/r-spatial/sf/issues/1762)
 
 # ----------------------------------------------------------------------------------
 # IMPORT THE DATA ----
 # ----------------------------------------------------------------------------------
 
 # > Country polygon
-geo_country_raw <- st_read(dsn = here("data/hdx/civ_admbnda_adm0_cntig_20180706/civ_admbnda_adm0_cntig_20180706.shp")) %>%
-  st_transform(4326)
+geo_country_raw <- sf::st_read(
+  dsn = here(
+    "data/hdx/civ_admbnda_adm0_cntig_20180706/civ_admbnda_adm0_cntig_20180706.shp"
+  )
+) %>%
+  sf::st_transform(crs = 4326)
 
 
 # > Population for each health district
-pop_hd_raw <- read_xls(here("data/BD ETS SANITAIRES_avec coord gps07062022.xls"), sheet = 2, skip = 4)
+pop_hd_raw <- read_xls(
+  here("data/BD ETS SANITAIRES_avec coord gps07062022.xls"),
+  sheet = 2,
+  skip = 4
+)
 
 pop_hd_data <- pop_hd_raw %>%
   setNames(c("region", "district", "pop")) %>%
   filter(!is.na(district), !is.na(pop)) %>%
-  select(-region) 
+  select(-region)
 
 # > Health districts
-geo_hd_raw <- st_read(dsn = here("data/admin_divisions_2020/DISTRICT SANITAIRE 2020.shp")) %>% 
+geo_hd_raw <- st_read(
+  dsn = here("data/admin_divisions_2020/DISTRICT SANITAIRE 2020.shp")
+) %>%
   st_transform(4326) %>%
   left_join(y = pop_hd_data, by = c("NOM" = "district")) %>%
   mutate(
@@ -52,11 +66,19 @@ geo_hd_raw <- st_read(dsn = here("data/admin_divisions_2020/DISTRICT SANITAIRE 2
 geo_hs_raw_1 <- afrihealthsites(country = "CIV", plot = FALSE)
 
 # > Health sites (2) (from the country's administration)
-hs_raw <- read_xls(here("data/BD ETS SANITAIRES_avec coord gps07062022.xls"))
+hs_raw <- readxl::read_xls(here(
+  "data/BD ETS SANITAIRES_avec coord gps07062022.xls"
+))
 
 geo_hs_raw_2 <- hs_raw %>%
   clean_names() %>%
-  select(nom_etablissement, longitude, latitude, niveau_etablissement, statut_etablissement) %>%
+  select(
+    nom_etablissement,
+    longitude,
+    latitude,
+    niveau_etablissement,
+    statut_etablissement
+  ) %>%
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
 
 
@@ -68,17 +90,17 @@ geo_hs_raw_2 <- hs_raw %>%
 
 # > Map all health sites in the country (points)
 
-tm_shape(shp = geo_country_raw) +
-  tm_polygons() +
-  tm_shape(shp = geo_hs_raw_2) +
-  tm_dots(col = "red")
+tmap::tm_shape(shp = geo_country_raw) +
+  tmap::tm_polygons() +
+  tmap::tm_shape(shp = geo_hs_raw_2) +
+  tmap::tm_dots(fill = "red")
 
 # > Map of all health sites with health districts (points)
 
 tm_shape(shp = geo_hd_raw) +
   tm_polygons() +
   tm_shape(shp = geo_hs_raw_2) +
-  tm_dots(col = "red", alpha = 0.4)
+  tm_dots(fill = "red", fill_alpha = 0.4)
 
 
 # 1.b - Determine appropriate health sites for storage and handling of cure ----
@@ -102,7 +124,7 @@ ggplot(data = hs_count_type) +
 geo_app_hs <- geo_hs_raw_1 %>%
   select(osm_id, amenity, completeness) %>%
   filter(
-    amenity %in% c("clinic", "doctors", "hospital"), 
+    amenity %in% c("clinic", "doctors", "hospital"),
     completeness >= 20
   )
 
@@ -178,11 +200,16 @@ tm_shape(shp = geo_hd) +
   tm_fill(col = "darkgreen", alpha = 0.5)
 
 # > Filter the corresponding health districts
-buffers_50km_app_hs_intersections <- st_intersects(x = geo_buffers_50km %>% filter(n_app_hs > 0), y = geo_app_hs)
+buffers_50km_app_hs_intersections <- st_intersects(
+  x = geo_buffers_50km %>% filter(n_app_hs > 0),
+  y = geo_app_hs
+)
 
 buffers_no_intersection <- geo_buffers_50km %>%
   filter(n_app_hs > 0) %>%
-  mutate(n_app_hs_within_50km = map_dbl(buffers_50km_app_hs_intersections, length)) %>%
+  mutate(
+    n_app_hs_within_50km = map_dbl(buffers_50km_app_hs_intersections, length)
+  ) %>%
   filter(n_app_hs_within_50km == 0) %>%
   st_transform(crs = 4326)
 
@@ -199,7 +226,9 @@ tm_shape(shp = geo_hd) +
 
 buffers_with_intersection <- geo_buffers_50km %>%
   filter(n_app_hs > 0) %>%
-  mutate(n_app_hs_within_50km = map_dbl(buffers_50km_app_hs_intersections, length)) %>%
+  mutate(
+    n_app_hs_within_50km = map_dbl(buffers_50km_app_hs_intersections, length)
+  ) %>%
   filter(n_app_hs_within_50km > 0) %>%
   st_transform(crs = 4326)
 
@@ -218,7 +247,10 @@ geo1 <- geo_app_hs %>%
   mutate(id = row_number(), status = "appropriate") %>%
   select(id, status)
 
-hd_fine_nearest_hs_intersections <- st_intersects(x = geo_hd_fine, y = geo_nearest_hs)
+hd_fine_nearest_hs_intersections <- st_intersects(
+  x = geo_hd_fine,
+  y = geo_nearest_hs
+)
 
 geo2 <- geo_nearest_hs %>%
   slice(-unlist(hd_fine_nearest_hs_intersections)) %>%
@@ -233,11 +265,11 @@ tm_shape(shp = geo_hd) +
   tm_shape(shp = geo1) +
   tm_dots(col = "blue") +
   tm_shape(shp = geo2) +
-  tm_dots(col = "orange") 
+  tm_dots(col = "orange")
 
 
 # ------------------------------------------------------------------------------
-# ---- OBJECTIVE 3: WHAT ARE THE HEALTH DISTRICTS WITH THE HIGHEST RISKS? 
+# ---- OBJECTIVE 3: WHAT ARE THE HEALTH DISTRICTS WITH THE HIGHEST RISKS?
 # ------------------------------------------------------------------------------
 
 # 3.a Calculate the population density in each health district ----
@@ -250,7 +282,7 @@ geo_hd <- geo_hd_raw %>%
 
 
 tm_shape(shp = geo_hd) +
-  tm_polygons(col = "density") 
+  tm_polygons(col = "density")
 
 tm_shape(shp = geo_hd) +
   tm_borders() +
@@ -265,7 +297,7 @@ geo_target_hs_buffer_50km <- geo_target_hs %>%
   st_transform(crs = 4326) %>%
   mutate(buffer_area = as.numeric(st_area(geometry) / 1e6))
 
-influence_index <- 
+influence_index <-
   st_intersection(x = geo_hd, y = geo_target_hs_buffer_50km) %>%
   mutate(
     influence_index = density * area
@@ -287,7 +319,6 @@ tm_shape(shp = geo_hd) +
   tm_fill(col = "density", breaks = c(0, 50, 100, 500, 2000, 10000, 30000)) +
   tm_shape(shp = influence_index %>% slice(1:20)) +
   tm_fill(col = "darkgreen", alpha = 0.5)
-
 
 
 # 3.d Top 100 target health sites ----
