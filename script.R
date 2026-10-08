@@ -28,23 +28,23 @@ sf::sf_use_s2(FALSE) # To avoid an error regarding "duplicate vertex with edge" 
 
 # > Country polygon
 geo_country_raw <- sf::st_read(
-  dsn = here(
+  dsn = here::here(
     "data/hdx/civ_admbnda_adm0_cntig_20180706/civ_admbnda_adm0_cntig_20180706.shp"
   )
-) %>%
+) |>
   sf::st_transform(crs = 4326)
 
 
 # > Population for each health district
-pop_hd_raw <- read_xls(
-  here("data/BD ETS SANITAIRES_avec coord gps07062022.xls"),
+pop_hd_raw <- readxl::read_xls(
+  here::here("data/BD ETS SANITAIRES_avec coord gps07062022.xls"),
   sheet = 2,
   skip = 4
 )
 
-pop_hd_data <- pop_hd_raw %>%
-  setNames(c("region", "district", "pop")) %>%
-  filter(!is.na(district), !is.na(pop)) %>%
+pop_hd_data <- pop_hd_raw |>
+  setNames(c("region", "district", "pop")) |>
+  filter(!is.na(district), !is.na(pop)) |>
   select(-region)
 
 # > Health districts
@@ -131,7 +131,7 @@ geo_app_hs <- geo_hs_raw_1 %>%
 tm_shape(shp = geo_hd_raw) +
   tm_polygons() +
   tm_shape(shp = geo_app_hs) +
-  tm_dots(col = "red")
+  tm_dots(fill = "red", fill_alpha = 0.4)
 
 
 # 1.c Determine health districts with no appropriate health sites ----
@@ -163,9 +163,9 @@ geo_hd_centroids <- st_centroid(x = geo_hd)
 tm_shape(shp = geo_hd_raw) +
   tm_polygons() +
   tm_shape(shp = geo_app_hs) +
-  tm_dots(col = "red") +
+  tm_dots(fill = "red") +
   tm_shape(shp = geo_hd_centroids) +
-  tm_dots(col = "darkgreen", size = 0.01)
+  tm_dots(fill = "darkgreen", size = 0.01)
 
 
 # 2.b For each health district, find out the health facility which is closest to the centroid ----
