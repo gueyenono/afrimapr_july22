@@ -14,7 +14,7 @@ pacman::p_load(
 )
 
 # Set mapping mode to interactive
-tmap::tmap_mode(mode = "view")
+tmap::tmap_mode(mode = "plot")
 
 # With many points, tmap v4 switches to WebGL (leafgl) in "view" mode, which
 # often fails to render. Use regular leaflet markers instead.
@@ -163,9 +163,9 @@ geo_hd_centroids <- st_centroid(x = geo_hd)
 tm_shape(shp = geo_hd_raw) +
   tm_polygons() +
   tm_shape(shp = geo_app_hs) +
-  tm_dots(fill = "red") +
+  tm_dots(fill = "red", ) +
   tm_shape(shp = geo_hd_centroids) +
-  tm_dots(fill = "darkgreen", size = 0.01)
+  tm_dots(fill = "darkgreen", size = 0.5)
 
 
 # 2.b For each health district, find out the health facility which is closest to the centroid ----
@@ -176,9 +176,9 @@ geo_nearest_hs <- geo_hs_raw_2 %>% slice(unlist(geo_nearest_hs_indices))
 tm_shape(shp = geo_hd_raw) +
   tm_polygons() +
   tm_shape(shp = geo_hd_centroids) +
-  tm_dots(col = "darkgreen", size = 0.01) +
+  tm_dots(col = "darkgreen", size = 0.5) +
   tm_shape(shp = geo_nearest_hs) +
-  tm_dots(col = "red")
+  tm_dots(fill = "red", size = 0.5)
 
 
 # 2.c In the health districts with appropriate health sites, do we still need to upgrade some more optimally located health sites? (appropriate health sites over 50 km from centroid) ----
@@ -263,9 +263,9 @@ geo_target_hs <- bind_rows(x = geo1, y = geo2)
 tm_shape(shp = geo_hd) +
   tm_polygons() +
   tm_shape(shp = geo1) +
-  tm_dots(col = "blue") +
+  tm_dots(fill = "blue") +
   tm_shape(shp = geo2) +
-  tm_dots(col = "orange")
+  tm_dots(fill = "orange")
 
 
 # ------------------------------------------------------------------------------
