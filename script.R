@@ -282,7 +282,7 @@ geo_hd <- geo_hd_raw %>%
 
 
 tm_shape(shp = geo_hd) +
-  tm_polygons(col = "density")
+  tm_polygons(fill = "density")
 
 tm_shape(shp = geo_hd) +
   tm_borders() +
